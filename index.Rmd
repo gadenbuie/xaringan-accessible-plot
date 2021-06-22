@@ -1,0 +1,105 @@
+---
+title: "Testing Plot Accessibility"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    seal: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: 16:9
+---
+
+```{r xaringanthemer, include=FALSE}
+library(xaringanthemer)
+library(ggplot2)
+style_duo_accent(colors = c(yellow = "#f3b61f"))
+```
+
+```{r lemur-pop-setup, include=FALSE}
+set.seed(4242)
+lemurs <- tibble::tibble(
+  year = 2000:2020,
+  population = 500 + (25 * (year - 2000)) + floor(runif(length(year), -50, 50))
+)
+```
+
+These slides test various approaches to increasing the accessibility of plots in xaringan slides.
+The code for the plot is presented in a later slide.
+
+The test on the next slide uses the slide heading as the plot title. The code is hidden and the `fig.alt` chunk option is used to add alt text to the plot. The data in the plot is printed in a visually hidden block after the image.
+
+---
+
+# Lemur Population
+
+```{r lemur-pop, fig.width=10, fig.height=4.5, echo=FALSE, out.width="100%", dev="svg", fig.alt = "Line chart of a simulated lemur population from 2000 to 2020."}
+ggplot(lemurs) +
+  aes(year, population) +
+  geom_line(size = 2) +
+  labs(x = NULL, y = NULL, title = NULL) +
+  theme_xaringan()
+```
+
+.visually-hidden[
+The line chart contains the following data:
+
+```{r echo=FALSE}
+knitr::kable(lemurs, format.args = list(big.mark = ","))
+```
+]
+
+<style>
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  -webkit-clip-path: inset(50%);
+          clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
+}
+</style>
+
+---
+
+The test on the next slide uses the plot as the slide's background image.
+The visually hidden block is used again with a table containing the data.
+
+---
+background-image: url(`r knitr::fig_chunk("lemur-pop-plot", "svg")`)
+background-size: 90%
+
+.visually-hidden[
+This slide shows a line chart of a simulated lemur population from 2000 to 2020.
+
+```{r echo=FALSE}
+knitr::kable(lemurs, format.args = list(big.mark = ","))
+```
+]
+
+---
+
+I tested directly embedding the SVG file here, but it very much did not work.
+
+---
+
+# Code for the plot
+
+```{r ref.label="lemur-pop-setup"}
+```
+
+```{r lemur-pop-plot, fig.width=16 * 2/3, fig.height=9 * 2/3, dev="svg", fig.show="hide"}
+library(ggplot2)
+ggplot(lemurs) +
+  aes(year, population) +
+  geom_line(size = 2) +
+  labs(x = NULL, y = NULL, title = "Lemur Population") +
+  theme_xaringan()
+```
